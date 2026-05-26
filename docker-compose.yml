@@ -1,0 +1,19 @@
+services:
+  app:
+    container_name: entornoci
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    #environment: ¿Por qué hace falta? Porque a veces Docker no notifica bien 
+    # los cambios del sistema de archivos entre Windows y el contenedor Linux
+    # - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  node_modules:
