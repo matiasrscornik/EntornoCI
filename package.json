@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "src/sum.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "vitest run" 
-    
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/matiasrscornik/EntornoCI#readme",
   "devDependencies": {
+    "vite": "^8.0.14",
     "vitest": "^4.1.7"
   }
 }
