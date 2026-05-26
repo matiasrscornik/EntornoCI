@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/matiasrscornik/EntornoCI/issues"
   },
-  "homepage": "https://github.com/matiasrscornik/EntornoCI#readme"
+  "homepage": "https://github.com/matiasrscornik/EntornoCI#readme",
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
 }
