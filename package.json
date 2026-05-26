@@ -1,0 +1,20 @@
+{
+  "name": "entornoci",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matiasrscornik/EntornoCI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matiasrscornik/EntornoCI/issues"
+  },
+  "homepage": "https://github.com/matiasrscornik/EntornoCI#readme"
+}
