@@ -23,7 +23,7 @@ const runUrl = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_
 const status = SLACK_JOB_STATUS.toUpperCase();
 const isSuccess = status === 'SUCCESS';
 const color = SLACK_COLOR || (isSuccess ? 'good' : 'danger');
-const title = `${statusIcon} ${SLACK_TITLE || `GitHub Actions ${status}`}`;
+const title = SLACK_TITLE || `GitHub Actions ${status}`;
 const message = SLACK_MESSAGE || `${SLACK_JOB_NAME} termino con estado ${status}.`;
 
 const blocks = [

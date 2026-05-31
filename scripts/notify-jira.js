@@ -81,4 +81,6 @@ if (!response.ok) {
   throw new Error(`Jira notification failed (${response.status}): ${errorBody}`);
 }
 
-console.log(`Jira notification sent to ${issueKey}.`);
+const comment = await response.json();
+console.log(`Jira notification sent to ${issueKey}. Comment id: ${comment.id}`);
+console.log(`Jira comment URL: ${baseUrl}/browse/${issueKey}?focusedCommentId=${comment.id}`);
