@@ -29,6 +29,60 @@ body {
 	padding: 24px;
 }
 
+.page-info {
+	position: fixed;
+	top: 20px;
+	right: 24px;
+	z-index: 1;
+	text-align: right;
+	color: var(--text);
+	font-weight: 800;
+	line-height: 1.25;
+}
+
+.page-info p {
+	margin: 0;
+}
+
+.page-info p + p {
+	margin-top: 4px;
+	color: var(--muted);
+	font-size: 0.95rem;
+	font-weight: 700;
+}
+
+.calculator {
+	width: min(100%, 730px);
+	background: var(--card);
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	border-radius: 28px;
+	padding: 28px;
+	box-shadow: var(--shadow);
+}
+
+.calculator .subtitle {
+	margin: 12px 0 24px;
+	color: var(--muted);
+	line-height: 1.5;
+}
+
+.calculator label {
+	display: block;
+	margin: 20px 0 10px;
+}
+
+.calculator input {
+	margin-bottom: 6px;
+}
+
+.calculator button {
+	margin-top: 18px;
+}
+
+.calculator .result {
+	margin-top: 18px;
+}
+
 .shell {
 	width: min(100%, 860px);
 	display: grid;
@@ -153,18 +207,4 @@ button:active {
 	font-weight: 900;
 	letter-spacing: 0.02em;
 	word-break: break-word;
-}
-
-@media (max-width: 800px) {
-	.shell {
-		grid-template-columns: 1fr;
-	}
-
-	.hero {
-		text-align: center;
-	}
-
-	.lead {
-		margin-inline: auto;
-	}
 }
