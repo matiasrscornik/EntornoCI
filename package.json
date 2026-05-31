@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "jira:notify": "node scripts/notify-jira.js",
     "test": "npm run lint && vitest run",
     "test:coverage": "npm run lint && vitest run --coverage"
   },
