@@ -12,16 +12,21 @@ const {
   JIRA_PROJECT_KEY,
 } = process.env;
 
-const issuePattern = JIRA_PROJECT_KEY
-  ? new RegExp(`\\b${JIRA_PROJECT_KEY.toUpperCase()}-\\d+\\b`, 'i')
-  : /\b[A-Z][A-Z0-9]+-\d+\b/;
+const normalizedProjectKey = JIRA_PROJECT_KEY?.split('-')[0]?.toUpperCase();
+const issuePattern = /\b[A-Z][A-Z0-9]+-\d+\b/g;
+const issueKeys = JIRA_ISSUE_TEXT.match(issuePattern) ?? [];
+const issueKey = issueKeys
+  .map((key) => key.toUpperCase())
+  .find((key) => !normalizedProjectKey || key.startsWith(`${normalizedProjectKey}-`));
 
-const issueKey = JIRA_ISSUE_TEXT.match(issuePattern)?.[0]?.toUpperCase();
+console.log(`Jira issue text: ${JIRA_ISSUE_TEXT}`);
 
 if (!issueKey) {
   console.log('No Jira issue key found. Skipping Jira notification.');
   process.exit(0);
 }
+
+console.log(`Jira issue key found: ${issueKey}`);
 
 const missingSecrets = [
   ['JIRA_BASE_URL', JIRA_BASE_URL],
@@ -37,7 +42,13 @@ if (missingSecrets.length > 0) {
 const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : 'unknown';
 const runUrl = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
 const status = JIRA_JOB_STATUS.toUpperCase();
-const message = `CI ${status} for ${GITHUB_REPOSITORY} on ${GITHUB_REF_NAME}. Commit: ${shortSha}. Run: ${runUrl}`;
+const messageLines = [
+  `GitHub Actions finalizo con estado: ${status}`,
+  `Repositorio: ${GITHUB_REPOSITORY}`,
+  `Rama: ${GITHUB_REF_NAME}`,
+  `Commit: ${shortSha}`,
+  `Run: ${runUrl}`,
+];
 const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 const baseUrl = JIRA_BASE_URL.replace(/\/$/, '');
 
@@ -52,17 +63,15 @@ const response = await fetch(`${baseUrl}/rest/api/3/issue/${issueKey}/comment`, 
     body: {
       type: 'doc',
       version: 1,
-      content: [
-        {
-          type: 'paragraph',
-          content: [
-            {
-              type: 'text',
-              text: message,
-            },
-          ],
-        },
-      ],
+      content: messageLines.map((text) => ({
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text,
+          },
+        ],
+      })),
     },
   }),
 });
