@@ -13,7 +13,7 @@ const {
 } = process.env;
 
 const normalizedProjectKey = JIRA_PROJECT_KEY?.split('-')[0]?.toUpperCase();
-const issuePattern = /\b[A-Z][A-Z0-9]+-\d+\b/g;
+const issuePattern = /\b[A-Z][A-Z0-9]+-\d+\b/gi;
 const issueKeys = JIRA_ISSUE_TEXT.match(issuePattern) ?? [];
 const issueKey = issueKeys
   .map((key) => key.toUpperCase())

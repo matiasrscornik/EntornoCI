@@ -53,7 +53,7 @@ jobs:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}
           JIRA_JOB_STATUS: ${{ job.status }}
-          JIRA_ISSUE_TEXT: ${{ github.event.head_commit.message }} ${{ github.ref_name }} ${{ github.event.pull_request.title }} ${{ github.event.pull_request.head.ref }}
+          JIRA_ISSUE_TEXT: ${{ github.event.head_commit.message }} ${{ github.ref_name }} ${{ github.event.pull_request.title }} ${{ github.event.pull_request.head.ref }} ${{ github.event.pull_request.body }}
 
       - name: Notify Slack on failure
         if: failure()
