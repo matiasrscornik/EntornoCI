@@ -1,8 +1,5 @@
 const {
   GITHUB_REF_NAME,
-  GITHUB_REPOSITORY,
-  GITHUB_RUN_ID,
-  GITHUB_SERVER_URL = 'https://github.com',
   GITHUB_SHA,
   JIRA_API_TOKEN,
   JIRA_BASE_URL,
@@ -40,14 +37,11 @@ if (missingSecrets.length > 0) {
 }
 
 const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : 'unknown';
-const runUrl = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
 const status = JIRA_JOB_STATUS.toUpperCase();
 const messageLines = [
   `GitHub Actions finalizo con estado: ${status}`,
-  `Repositorio: ${GITHUB_REPOSITORY}`,
   `Rama: ${GITHUB_REF_NAME}`,
   `Commit: ${shortSha}`,
-  `Run: ${runUrl}`,
 ];
 const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 const baseUrl = JIRA_BASE_URL.replace(/\/$/, '');
