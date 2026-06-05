@@ -1,8 +1,5 @@
 const {
   GITHUB_REF_NAME,
-  GITHUB_REPOSITORY,
-  GITHUB_RUN_ID,
-  GITHUB_SERVER_URL = 'https://github.com',
   GITHUB_SHA,
   JIRA_API_TOKEN,
   JIRA_BASE_URL,
@@ -13,7 +10,7 @@ const {
 } = process.env;
 
 const normalizedProjectKey = JIRA_PROJECT_KEY?.split('-')[0]?.toUpperCase();
-const issuePattern = /\b[A-Z][A-Z0-9]+-\d+\b/g;
+const issuePattern = /\b[A-Z][A-Z0-9]+-\d+\b/gi;
 const issueKeys = JIRA_ISSUE_TEXT.match(issuePattern) ?? [];
 const issueKey = issueKeys
   .map((key) => key.toUpperCase())
@@ -40,14 +37,11 @@ if (missingSecrets.length > 0) {
 }
 
 const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : 'unknown';
-const runUrl = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
 const status = JIRA_JOB_STATUS.toUpperCase();
 const messageLines = [
   `GitHub Actions finalizo con estado: ${status}`,
-  `Repositorio: ${GITHUB_REPOSITORY}`,
   `Rama: ${GITHUB_REF_NAME}`,
   `Commit: ${shortSha}`,
-  `Run: ${runUrl}`,
 ];
 const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
 const baseUrl = JIRA_BASE_URL.replace(/\/$/, '');
