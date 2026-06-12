@@ -2,11 +2,30 @@ import { describe, expect, it } from 'vitest';
 import { concatenateNumbers } from '../src/concatenate.js';
 
 describe('concatenateNumbers', () => {
-  it('concatena dos valores no vacíos', () => {
+  const invalidMessage = 'Se deben ingresar dos numeros validos';
+
+  it('concatena dos numeros validos', () => {
     expect(concatenateNumbers('12', '34')).toBe('1234');
   });
 
-  it('rechaza valores vacíos', () => {
-    expect(concatenateNumbers('', '34')).toBe('Se deben ingresar dos números válidos');
+  it('conserva los ceros iniciales', () => {
+    expect(concatenateNumbers('01', '02')).toBe('0102');
+  });
+
+  it('ignora espacios alrededor de los numeros', () => {
+    expect(concatenateNumbers(' 12 ', ' 34 ')).toBe('1234');
+  });
+
+  it.each([
+    ['', '34'],
+    ['12', ''],
+    ['hola', '34'],
+    ['12', 'mundo'],
+    ['12abc', '34'],
+    ['12.5', '34'],
+    ['-12', '34'],
+    ['   ', '34'],
+  ])('rechaza entradas invalidas: %j y %j', (num1, num2) => {
+    expect(concatenateNumbers(num1, num2)).toBe(invalidMessage);
   });
 });
