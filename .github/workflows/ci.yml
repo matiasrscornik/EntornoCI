@@ -13,8 +13,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  quality-check:
-    name: Lint, Test and Build
+  lint-check:
+    name: Linter de codigo 
     runs-on: ubuntu-latest
     environment: ci
 
@@ -33,7 +33,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run lint, tests and coverage
+      - name: Run lint
+        run: npm run lint
+
+  test-coverage-sonar:
+    name: Test, Coverage, Build and SonarCloud
+    runs-on: ubuntu-latest
+    needs: lint-check
+    environment: ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
         run: npm run test:coverage
 
       - name: Build project
@@ -44,10 +68,9 @@ jobs:
         with:
           scannerVersion: 8.1.0.6389
         env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Notify Jira
-        if: always()
         run: npm run jira:notify
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
@@ -63,92 +86,129 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_TITLE: Tests y SonarCloud fallaron
-          SLACK_JOB_NAME: Tests, coverage, build and SonarCloud
+          SLACK_JOB_NAME: Tests, coverage y SonarCloud
           SLACK_JOB_STATUS: ${{ job.status }}
           SLACK_COLOR: danger
           SLACK_MESSAGE: "❌ Fallaron las validaciones de CI en `${{ github.ref_name }}` por ${{ github.actor }}."
 
-  # Deploy desactivado temporalmente.
-  # Cuando el proyecto este mas refinado, descomentar este job y el job
-  # notify-slack-pipeline-success para volver a desplegar en Vercel.
-  #
-  # deploy-production:
-  #   name: Deploy to Vercel
-  #   runs-on: ubuntu-latest
-  #   needs: quality-check
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  #   environment: production
-  #   env:
-  #     VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  #     VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  #
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22
-  #         cache: npm
-  #
-  #     - name: Install dependencies
-  #       run: npm ci
-  #
-  #     - name: Install Vercel CLI
-  #       run: npm install --global vercel@latest
-  #
-  #     - name: Pull Vercel environment
-  #       run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-  #
-  #     - name: Build Vercel output
-  #       run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-  #
-  #     - name: Deploy to Vercel
-  #       run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-  #
-  #     - name: Notify Slack on deploy success
-  #       run: npm run slack:notify
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #         SLACK_TITLE: Deploy Vercel exitoso
-  #         SLACK_JOB_NAME: Deploy to Vercel
-  #         SLACK_JOB_STATUS: success
-  #         SLACK_COLOR: good
-  #         SLACK_MESSAGE: Deploy a Vercel realizado correctamente en `${{ github.ref_name }}` por ${{ github.actor }}.
-  #
-  #     - name: Notify Slack on deploy failure
-  #       if: failure()
-  #       run: npm run slack:notify
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #         SLACK_TITLE: Deploy Vercel fallido
-  #         SLACK_JOB_NAME: Deploy to Vercel
-  #         SLACK_JOB_STATUS: ${{ job.status }}
-  #         SLACK_COLOR: danger
-  #         SLACK_MESSAGE: "❌ Fallo el deploy a Vercel en `${{ github.ref_name }}` por ${{ github.actor }}."
-  #
-  # notify-slack-pipeline-success:
-  #   name: Notify pipeline success
-  #   runs-on: ubuntu-latest
-  #   needs: deploy-production
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.deploy-production.result == 'success'
-  #
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22
-  #
-  #     - name: Notify Slack pipeline success
-  #       run: npm run slack:notify
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #         SLACK_TITLE: Pipeline finalizado con exito
-  #         SLACK_JOB_NAME: Pipeline completo
-  #         SLACK_JOB_STATUS: success
-  #         SLACK_COLOR: good
-  #         SLACK_MESSAGE: "✅ Tests, coverage, SonarCloud, build y deploy finalizaron correctamente en `${{ github.ref_name }}` por ${{ github.actor }}."
+  deploy-production:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: test-coverage-sonar
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Vercel output
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        shell: bash
+        run: |
+          deployment_url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
+
+      - name: Notify Slack on deploy failure
+        if: failure()
+        run: npm run slack:notify
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: Deploy Vercel fallido
+          SLACK_JOB_NAME: Deploy to Vercel
+          SLACK_JOB_STATUS: ${{ job.status }}
+          SLACK_COLOR: danger
+          SLACK_MESSAGE: "❌ Fallo el deploy a Vercel en `${{ github.ref_name }}` por ${{ github.actor }}."
+
+  cypress-e2e:
+    name: Testear el deploy
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    environment: production
+    env:
+      CYPRESS_BASE_URL: ${{ needs.deploy-production.outputs.deployment-url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Cypress against Vercel
+        run: npm run e2e:run
+
+      - name: Upload Cypress evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-evidence
+          path: |
+            cypress/screenshots
+            cypress/videos
+          if-no-files-found: ignore
+
+      - name: Notify Slack on Cypress failure
+        if: failure()
+        run: npm run slack:notify
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: Pruebas E2E fallidas
+          SLACK_JOB_NAME: Cypress E2E on Vercel
+          SLACK_JOB_STATUS: ${{ job.status }}
+          SLACK_COLOR: danger
+          SLACK_MESSAGE: "❌ Cypress fallo sobre `${{ env.CYPRESS_BASE_URL }}`."
+
+  notify-slack-pipeline-success:
+    name: Notify pipeline success
+    runs-on: ubuntu-latest
+    needs: cypress-e2e
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Notify Slack pipeline success
+        run: npm run slack:notify
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: Pipeline finalizado con exito
+          SLACK_JOB_NAME: Pipeline completo
+          SLACK_JOB_STATUS: success
+          SLACK_COLOR: good
+          SLACK_MESSAGE: "✅ Tests, coverage, SonarCloud, build, deploy y Cypress finalizaron correctamente en `${{ github.ref_name }}` por ${{ github.actor }}."
