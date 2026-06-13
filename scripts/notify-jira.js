@@ -37,7 +37,12 @@ if (missingSecrets.length > 0) {
 }
 
 const shortSha = GITHUB_SHA ? GITHUB_SHA.slice(0, 7) : 'unknown';
-const status = JIRA_JOB_STATUS.toUpperCase();
+const normalizedStatus = JIRA_JOB_STATUS.trim().toLowerCase();
+const status = normalizedStatus === 'success'
+  ? 'SUCCESS'
+  : ['failure', 'cancelled', 'timed_out', 'skipped'].includes(normalizedStatus)
+    ? 'FAILURE'
+    : normalizedStatus.toUpperCase();
 const messageLines = [
   `GitHub Actions finalizo con estado: ${status}`,
   `Rama: ${GITHUB_REF_NAME}`,
