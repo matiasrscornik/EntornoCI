@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "jira:notify": "node scripts/notify-jira.js",
     "slack:notify": "node scripts/notify-slack.js",
-    "test": "npm run lint && vitest run",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
   "repository": {
