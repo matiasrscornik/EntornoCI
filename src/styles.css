@@ -175,7 +175,7 @@ button {
 	padding: 14px 16px;
 	border: 0;
 	border-radius: 16px;
-	background: linear-gradient(135deg, var(--accent), #0ea5e9);
+	background: linear-gradient(135deg, var(--accent), #0284c7);
 	color: white;
 	font-weight: 800;
 	cursor: pointer;
