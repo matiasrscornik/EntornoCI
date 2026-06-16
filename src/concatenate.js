@@ -11,6 +11,6 @@ export function concatenateNumbers(num1, num2) {
 }
 
 // Export global para navegador (sin import/export)
-if (typeof globalThis.window !== 'undefined') {
+if (globalThis.window !== undefined) {
   globalThis.window.concatenateNumbers = concatenateNumbers;
 }
