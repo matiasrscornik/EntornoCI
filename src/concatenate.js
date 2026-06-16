@@ -1,7 +1,7 @@
 export function concatenateNumbers(num1, num2) {
   const firstNumber = String(num1).trim();
   const secondNumber = String(num2).trim();
-  const containsOnlyDigits = /^[0-9]+$/; // Acepta unicamente digitos ASCII del 0 al 9.
+  const containsOnlyDigits = /^\d+$/; // Acepta unicamente digitos ASCII del 0 al 9.
 
   if (containsOnlyDigits.test(firstNumber) && containsOnlyDigits.test(secondNumber)) {
     return firstNumber + secondNumber;
@@ -11,6 +11,6 @@ export function concatenateNumbers(num1, num2) {
 }
 
 // Export global para navegador (sin import/export)
-if (typeof window !== 'undefined') {
-  window.concatenateNumbers = concatenateNumbers;
+if (typeof globalThis.window !== 'undefined') {
+  globalThis.window.concatenateNumbers = concatenateNumbers;
 }

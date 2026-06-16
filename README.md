@@ -4,9 +4,7 @@
 
 Este proyecto implementa una calculadora simple de concatenación construida con HTML, CSS y JavaScript. A diferencia de una calculadora tradicional, la aplicación no suma valores: concatena dos números ingresados por el usuario y muestra el resultado como texto.
 
-Aunque la interfaz corre en el navegador, el proyecto utiliza Node.js como entorno de ejecución para Vite, Vitest, ESLint y los scripts de automatización.
-
-El repositorio también incluye un flujo de Integración Continua con GitHub Actions que automatiza validaciones de calidad, pruebas, análisis con SonarCloud y despliegue en Vercel. Además, integra notificaciones hacia Jira y Slack para informar el estado del pipeline.
+El repositorio también incluye un flujo de Integración Continua con GitHub Actions que automatiza linting, pruebas unitarias con cobertura, análisis con SonarCloud, despliegue en Vercel y pruebas E2E con Cypress contra el deploy real. Además, integra notificaciones hacia Jira y Slack para informar el estado del pipeline.
 
 ## 🛠️ Tecnologías utilizadas
 
@@ -15,83 +13,78 @@ El repositorio también incluye un flujo de Integración Continua con GitHub Act
 - JavaScript ES Modules: lógica principal de concatenación.
 - Node.js y npm: entorno de ejecución y gestión de dependencias.
 - Vite: servidor de desarrollo y build de producción.
-- Vitest: pruebas unitarias.
+- Vitest: pruebas unitarias y cobertura.
+- Cypress: pruebas E2E contra el sitio desplegado.
 - ESLint: verificación de estilo y calidad de código.
 - GitHub Actions: automatización del pipeline de CI/CD.
 - SonarCloud: análisis estático y métricas de calidad.
 - Vercel: despliegue de producción.
-- Docker y Docker Compose: ejecución del proyecto en contenedores.
+- Docker y Docker Compose: ejecución opcional del proyecto en contenedores (no forma parte del flujo de deploy, que se hace directo a Vercel).
 - Jira: notificaciones y trazabilidad del flujo de trabajo.
-- Slack: alertas sobre estado de tests, coverage, build y deploy.
+- Slack: alertas sobre estado de tests, build, deploy y pruebas E2E.
 
 ## 🧩 Funcionalidades
 
 - Ingreso de dos valores numéricos.
 - Concatenación de ambos valores en lugar de una suma.
-- Validación básica de campos vacíos.
+- Validación básica de campos vacíos o inválidos.
 - Pruebas unitarias sobre la función principal.
-- Pipeline automático de linting, tests, coverage, build y análisis de calidad.
+- Pruebas E2E sobre el sitio ya desplegado en Vercel.
+- Pipeline automático de linting, tests, coverage, build, análisis de calidad, deploy y E2E.
 
 ## 📁 Estructura del proyecto
 
 - `src/`: aplicación principal.
-- `src/app.js`: lógica que conecta la interfaz con la función de concatenación.
-- `src/concatenate.js`: función principal de negocio.
-- `src/index.html`: estructura de la interfaz.
-- `src/styles.css`: estilos visuales.
-- `test/`: pruebas unitarias.
+  - `src/app.js`: lógica que conecta la interfaz con la función de concatenación.
+  - `src/concatenate.js`: función principal de negocio.
+  - `src/index.html`: estructura de la interfaz.
+  - `src/styles.css`: estilos visuales.
+- `test/`: pruebas unitarias (Vitest).
+  - `test/e2e/`: pruebas E2E (Cypress) contra el sitio desplegado.
+- `cypress.config.js`: configuración de Cypress (specs, screenshots y videos en `test/e2e/`).
 - `.github/workflows/ci.yml`: pipeline de CI/CD.
 - `scripts/`: scripts de notificación para Jira y Slack.
-- `Dockerfile`: imagen para ejecutar el proyecto con Docker.
-- `docker-compose.yml`: servicios para desarrollo y validación.
+- `sonar-project.properties`: configuración del análisis de SonarCloud.
+- `Dockerfile`: imagen opcional para correr el proyecto en un contenedor.
+- `docker-compose.yml`: servicios opcionales de desarrollo (`app`) y validación (`lint`, `test`) en Docker.
 
-## 🏃‍♂️ Cómo ejecutar el proyecto localmente
-
-1. Clonar el repositorio:
-
-```bash
-git clone https://github.com/matiasrscornik/EntornoCI.git
-```
-
-2. Entrar al directorio del proyecto:
-
-```bash
-cd EntornoCI
-```
-
-3. Instalar dependencias:
-
-```bash
-npm install
-```
-
-4. Levantar el servidor de desarrollo:
-
-```bash
-npm run dev
-```
 
 ## ✅ Scripts disponibles
 
 - `npm run dev`: inicia el servidor de desarrollo con Vite.
 - `npm run build`: genera la versión optimizada para producción.
+- `npm run preview`: sirve localmente el build de producción.
 - `npm run lint`: ejecuta ESLint sobre el código.
-- `npm test`: corre lint + pruebas unitarias.
-- `npm run test:coverage`: corre lint + pruebas con cobertura.
+- `npm test`: corre las pruebas unitarias con Vitest.
+- `npm run test:coverage`: corre las pruebas unitarias generando reporte de cobertura (usado por SonarCloud).
+- `npm run e2e:open`: abre la interfaz de Cypress para pruebas E2E interactivas.
+- `npm run e2e:run`: corre las pruebas E2E de Cypress en modo headless.
 - `npm run jira:notify`: envía notificación a Jira.
 - `npm run slack:notify`: envía notificación a Slack.
 
 ## 🔄 Pipeline de CI/CD
 
-El flujo automatizado definido en GitHub Actions realiza los siguientes pasos:
+El pipeline de GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) se dispara en push y pull requests hacia `main`, y está dividido en jobs encadenados:
 
-1. Checkout del repositorio.
-2. Configuración de Node.js 22.
-3. Instalación de dependencias con `npm ci`.
-4. Ejecución de lint, tests y coverage.
-5. Build de la aplicación.
-6. Escaneo de calidad con SonarCloud.
-7. Notificación a Jira en todos los casos.
-8. Notificación a Slack si falla alguna validación.
-9. Deploy en Vercel cuando el push llega a `main`.
-10. Notificación a Slack si se realiza el deploy con éxito.
+1. **lint-check**: instala dependencias y corre ESLint.
+2. **test-coverage-sonar** (depende de `lint-check`): corre tests con cobertura, build de Vite y escaneo de SonarCloud usando el reporte de cobertura generado. Notifica a Slack si falla.
+3. **deploy-production** (depende de `test-coverage-sonar`, solo en push a `main`): despliega a Vercel y expone la URL del deploy. Notifica a Slack si falla.
+4. **cypress-e2e** (depende de `deploy-production`): corre las pruebas E2E de Cypress contra la URL recién desplegada. Sube screenshots/videos como evidencia si falla.
+5. **notify-pipeline-result** (depende de todos los anteriores, solo en push a `main`): calcula el estado global del pipeline y notifica a Jira (incluyendo la rama de origen si el push viene de un merge de PR) y a Slack.
+
+## 🐳 Uso opcional con Docker
+
+El proyecto no se despliega con Docker (Vercel construye y sirve la app directamente), pero el `Dockerfile` permite levantarlo en un contenedor para entornos locales sin Node instalado:
+
+```bash
+docker build -t entornoci .
+docker run -p 4173:4173 entornoci
+```
+
+También se puede usar `docker-compose.yml` para desarrollo con hot reload (`app`) o para correr lint/tests dentro de un contenedor (`lint`, `test`, bajo el perfil `checks`):
+
+```bash
+docker compose up app
+docker compose --profile checks run lint
+docker compose --profile checks run test
+```

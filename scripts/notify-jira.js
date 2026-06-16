@@ -43,9 +43,14 @@ const status = normalizedStatus === 'success'
   : ['failure', 'cancelled', 'timed_out', 'skipped'].includes(normalizedStatus)
     ? 'FAILURE'
     : normalizedStatus.toUpperCase();
+
+const mergeMatch = JIRA_ISSUE_TEXT.match(/Merge pull request #\d+ from [\w.-]+\/([\w./-]+)/i);
+const sourceBranch = mergeMatch ? mergeMatch[1] : null;
+
 const messageLines = [
   `GitHub Actions finalizo con estado: ${status}`,
   `Rama: ${GITHUB_REF_NAME}`,
+  ...(sourceBranch ? [`Mergeado desde: ${sourceBranch}`] : []),
   `Commit: ${shortSha}`,
 ];
 const auth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');

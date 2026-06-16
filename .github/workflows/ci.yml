@@ -41,7 +41,7 @@ jobs:
         run: npm run lint
 
   test-coverage-sonar:
-    name: Test, Coverage, Build and SonarCloud
+    name: Test, Build and SonarCloud
     runs-on: ubuntu-latest
     needs: lint-check
     environment: ci
@@ -168,8 +168,8 @@ jobs:
         with:
           name: cypress-evidence
           path: |
-            cypress/screenshots
-            cypress/videos
+            test/e2e/screenshots
+            test/e2e/videos
           if-no-files-found: ignore
 
       - name: Notify Slack on Cypress failure
@@ -225,4 +225,4 @@ jobs:
           SLACK_TITLE: Resultado del pipeline
           SLACK_JOB_NAME: Pipeline completo
           SLACK_JOB_STATUS: ${{ env.PIPELINE_STATUS }}
-          SLACK_MESSAGE: ${{ env.PIPELINE_STATUS == 'success' && format('✅ Tests, coverage, SonarCloud, build, deploy y Cypress finalizaron correctamente en `{0}` por {1}.', github.ref_name, github.actor) || format('❌ El pipeline en `{0}` falló para {1}.', github.ref_name, github.actor) }}
+          SLACK_MESSAGE: ${{ env.PIPELINE_STATUS == 'success' && format('✅ Tests, SonarCloud, build, deploy y Cypress finalizaron correctamente en `{0}` por {1}.', github.ref_name, github.actor) || format('❌ El pipeline en `{0}` falló para {1}.', github.ref_name, github.actor) }}
