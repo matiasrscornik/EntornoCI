@@ -2,11 +2,11 @@ describe('Despliegue de la calculadora', () => {
   const bypassSecret = Cypress.env('VERCEL_AUTOMATION_BYPASS_SECRET');
   const visitOptions = bypassSecret
     ? {
-        headers: {
-          'x-vercel-protection-bypass': bypassSecret,
-          'x-vercel-set-bypass-cookie': 'true',
-        },
-      }
+      headers: {
+        'x-vercel-protection-bypass': bypassSecret,
+        'x-vercel-set-bypass-cookie': 'true',
+      },
+    }
     : undefined;
 
   beforeEach(() => {
