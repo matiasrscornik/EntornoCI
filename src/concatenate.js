@@ -9,8 +9,3 @@ export function concatenateNumbers(num1, num2) {
 
   return 'Se deben ingresar dos numeros validos';
 }
-
-// Export global para navegador (sin import/export)
-if (globalThis.window !== undefined) {
-  globalThis.window.concatenateNumbers = concatenateNumbers;
-}
