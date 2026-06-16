@@ -28,4 +28,25 @@ describe('concatenateNumbers', () => {
   ])('rechaza entradas invalidas: %j y %j', (num1, num2) => {
     expect(concatenateNumbers(num1, num2)).toBe(invalidMessage);
   });
+
+  it('acepta numeros enteros (no strings)', () => {
+    expect(concatenateNumbers(12, 34)).toBe('1234');
+  });
+
+  it('rechaza null', () => {
+    expect(concatenateNumbers(null, '34')).toBe(invalidMessage);
+  });
+
+  it('rechaza undefined', () => {
+    expect(concatenateNumbers(undefined, '34')).toBe(invalidMessage);
+  });
+
+  it('siempre retorna string', () => {
+    expect(typeof concatenateNumbers('1', '2')).toBe('string');
+    expect(typeof concatenateNumbers('a', 'b')).toBe('string');
+  });
+
+  it('concatena numeros largos', () => {
+    expect(concatenateNumbers('999999999', '000000001')).toBe('999999999000000001');
+  });
 });
