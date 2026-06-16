@@ -6,6 +6,8 @@ Este proyecto implementa una calculadora simple de concatenación construida con
 
 El repositorio también incluye un flujo de Integración Continua con GitHub Actions que automatiza linting, pruebas unitarias con cobertura, análisis con SonarCloud, despliegue en Vercel y pruebas E2E con Cypress contra el deploy real. Además, integra notificaciones hacia Jira y Slack para informar el estado del pipeline.
 
+![Diagrama del pipeline de CI/CD](https://github.com/user-attachments/assets/e88f5d28-599a-4070-b23c-1732ba0555b6)
+
 ## 🛠️ Tecnologías utilizadas
 
 - HTML: estructura de la aplicación.
