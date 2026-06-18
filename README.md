@@ -21,7 +21,6 @@ El repositorio también incluye un flujo de Integración Continua con GitHub Act
 - GitHub Actions: automatización del pipeline de CI/CD.
 - SonarCloud: análisis estático y métricas de calidad.
 - Vercel: despliegue de producción.
-- Docker y Docker Compose: ejecución opcional del proyecto en contenedores (no forma parte del flujo de deploy, que se hace directo a Vercel).
 - Jira: notificaciones y trazabilidad del flujo de trabajo.
 - Slack: alertas sobre estado de tests, build, deploy y pruebas E2E.
 
@@ -47,8 +46,6 @@ El repositorio también incluye un flujo de Integración Continua con GitHub Act
 - `.github/workflows/ci.yml`: pipeline de CI/CD.
 - `scripts/`: scripts de notificación para Jira y Slack.
 - `sonar-project.properties`: configuración del análisis de SonarCloud.
-- `Dockerfile`: imagen opcional para correr el proyecto en un contenedor.
-- `docker-compose.yml`: servicios opcionales de desarrollo (`app`) y validación (`lint`, `test`) en Docker.
 
 
 ## ✅ Scripts disponibles
@@ -73,20 +70,3 @@ El pipeline de GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.y
 3. **deploy-production** (depende de `test-coverage-sonar`, solo en push a `main`): despliega a Vercel y expone la URL del deploy. Notifica a Slack si falla.
 4. **cypress-e2e** (depende de `deploy-production`): corre las pruebas E2E de Cypress contra la URL recién desplegada. Sube screenshots/videos como evidencia si falla.
 5. **notify-pipeline-result** (depende de todos los anteriores, solo en push a `main`): calcula el estado global del pipeline y notifica a Jira (incluyendo la rama de origen si el push viene de un merge de PR) y a Slack.
-
-## 🐳 Uso opcional con Docker
-
-El proyecto no se despliega con Docker (Vercel construye y sirve la app directamente), pero el `Dockerfile` permite levantarlo en un contenedor para entornos locales sin Node instalado:
-
-```bash
-docker build -t entornoci .
-docker run -p 4173:4173 entornoci
-```
-
-También se puede usar `docker-compose.yml` para desarrollo con hot reload (`app`) o para correr lint/tests dentro de un contenedor (`lint`, `test`, bajo el perfil `checks`):
-
-```bash
-docker compose up app
-docker compose --profile checks run lint
-docker compose --profile checks run test
-```
