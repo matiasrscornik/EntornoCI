@@ -25,8 +25,19 @@ describe('concatenateNumbers', () => {
     ['12.5', '34'],
     ['-12', '34'],
     ['   ', '34'],
+    ['+12', '34'],
+    [12.5, 34],
+    [-12, 34],
+    [NaN, '34'],
+    [1e21, 34],
+    [true, '34'],
+    [{}, '34'],
   ])('rechaza entradas invalidas: %j y %j', (num1, num2) => {
     expect(concatenateNumbers(num1, num2)).toBe(invalidMessage);
+  });
+
+  it('acepta cero como numero valido', () => {
+    expect(concatenateNumbers(0, 0)).toBe('00');
   });
 
   it('acepta numeros enteros (no strings)', () => {
