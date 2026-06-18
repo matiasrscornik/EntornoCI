@@ -25,7 +25,7 @@ describe('Despliegue de la calculadora', () => {
     cy.get('#number2').type('34');
     cy.get('#concatButton').click();
 
-    cy.get('#result').should('have.text', 'Resultados: 1234');
+    cy.get('#result').should('have.text', 'Resultados: 9999');
   });
 
   it('muestra un mensaje para valores invalidos', () => {
