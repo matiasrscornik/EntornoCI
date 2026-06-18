@@ -6,7 +6,7 @@ Este proyecto implementa una calculadora simple de concatenación construida con
 
 El repositorio también incluye un flujo de Integración Continua con GitHub Actions que automatiza linting, pruebas unitarias con cobertura, análisis con SonarCloud, despliegue en Vercel y pruebas E2E con Cypress contra el deploy real. Además, integra notificaciones hacia Jira y Slack para informar el estado del pipeline.
 
-<img width="600" alt="Diagrama del pipeline de CI/CD" src="https://github.com/user-attachments/assets/e88f5d28-599a-4070-b23c-1732ba0555b6" />
+<img width="600" alt="Diagrama del pipeline de CI/CD" src="https://github.com/user-attachments/assets/8d67850b-3f70-4c06-8543-3f8caa0d890d" />
 
 ## 🛠️ Tecnologías utilizadas
 
@@ -56,6 +56,7 @@ El repositorio también incluye un flujo de Integración Continua con GitHub Act
 - `npm run lint`: ejecuta ESLint sobre el código.
 - `npm test`: corre las pruebas unitarias con Vitest.
 - `npm run test:coverage`: corre las pruebas unitarias generando reporte de cobertura (usado por SonarCloud).
+- `npm run localbuild`: corre lint, tests con cobertura, build de producción y levanta el preview local, dejando el proyecto listo para deployar.
 - `npm run e2e:open`: abre la interfaz de Cypress para pruebas E2E interactivas.
 - `npm run e2e:run`: corre las pruebas E2E de Cypress en modo headless.
 - `npm run jira:notify`: envía notificación a Jira.

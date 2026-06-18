@@ -14,7 +14,8 @@
     "jira:notify": "node scripts/notify-jira.js",
     "slack:notify": "node scripts/notify-slack.js",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "localbuild": "npm run lint && npm run test:coverage && npm run build && npm run preview"
   },
   "repository": {
     "type": "git",
